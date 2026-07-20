@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blocked - Stay Focused!</title>
+  <link rel="stylesheet" href="blocked.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="blocked-container">
+    <div class="glow-ring"></div>
+    <div class="content">
+      <div class="icon-pulse">🚫</div>
+      <h1>Stay Focused!</h1>
+      <p class="subtitle">This site is blocked during your focus session.</p>
+
+      <div class="session-card">
+        <div class="session-row">
+          <span class="session-label">📝 Task</span>
+          <span class="session-value" id="blockedTask">-</span>
+        </div>
+        <div class="session-row">
+          <span class="session-label">⏱️ Remaining</span>
+          <span class="session-value timer" id="blockedTimer">--:--</span>
+        </div>
+      </div>
+
+      <div class="quote-box">
+        <p class="quote" id="motivQuote">"The secret of getting ahead is getting started."</p>
+        <span class="quote-author" id="motivAuthor">— Mark Twain</span>
+      </div>
+
+      <button class="back-btn" id="goBackBtn">
+        ← Get Back to Work
+      </button>
+
+      <p class="hard-mode-notice hidden" id="hardModeNotice">
+        🔐 Hard Mode is active. You cannot disable blocking until the session ends.
+      </p>
+    </div>
+
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+  </div>
+  <script src="blocked.js"></script>
+</body>
+</html>

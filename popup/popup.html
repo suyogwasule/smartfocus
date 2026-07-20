@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400, initial-scale=1.0">
+  <title>Smart Focus</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">🎯</div>
+        <h1>Smart Focus</h1>
+      </div>
+      <button class="btn-icon" id="dashboardBtn" title="Open Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="focus">Focus</button>
+      <button class="tab" data-tab="block">Block</button>
+      <button class="tab" data-tab="group">Group</button>
+      <button class="tab" data-tab="stats">Stats</button>
+    </nav>
+
+    <!-- FOCUS TAB -->
+    <section class="tab-content active" id="tab-focus">
+      <!-- Task Entry (shown when no session) -->
+      <div class="task-entry" id="taskEntry">
+        <div class="input-group">
+          <label>Task Name</label>
+          <input type="text" id="taskName" placeholder="e.g., Study DBMS" maxlength="50">
+        </div>
+        <div class="input-row">
+          <div class="input-group flex-1">
+            <label>Duration</label>
+            <select id="duration">
+              <option value="15">15 min</option>
+              <option value="25" selected>25 min</option>
+              <option value="30">30 min</option>
+              <option value="45">45 min</option>
+              <option value="60">60 min</option>
+              <option value="90">90 min</option>
+              <option value="120">120 min</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input type="number" id="customDuration" class="custom-duration-input hidden" 
+              placeholder="Minutes" min="1" max="480" style="margin-top:6px;">
+          </div>
+          <div class="input-group flex-1">
+            <label>Mode</label>
+            <select id="sessionMode">
+              <option value="solo">🧍 Solo</option>
+              <option value="group">👥 Group</option>
+            </select>
+          </div>
+        </div>
+        <div class="hard-mode-toggle">
+          <label class="toggle-label">
+            <span>🔐 Hard Mode</span>
+            <span class="toggle-hint">Can't quit mid-session</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="hardMode">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <button class="btn-primary" id="startBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+          Start Focus Session
+        </button>
+      </div>
+
+      <!-- Timer (shown during session) -->
+      <div class="timer-view hidden" id="timerView">
+        <div class="timer-ring-wrapper">
+          <svg class="timer-ring" viewBox="0 0 200 200">
+            <circle class="timer-ring-bg" cx="100" cy="100" r="88" />
+            <circle class="timer-ring-progress" cx="100" cy="100" r="88" id="timerProgress" />
+          </svg>
+          <div class="timer-center">
+            <span class="timer-time" id="timerDisplay">25:00</span>
+            <span class="timer-label" id="timerLabel">FOCUS</span>
+            <span class="timer-task" id="timerTask">Study DBMS</span>
+          </div>
+        </div>
+        <div class="session-info" id="sessionInfo"></div>
+        <div class="timer-controls">
+          <button class="btn-control" id="pauseBtn" title="Pause">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+          </button>
+          <button class="btn-control btn-danger" id="stopBtn" title="End Session">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="1" />
+            </svg>
+          </button>
+          <button class="btn-control" id="breakBtn" title="Take Break">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 8h1a4 4 0 010 8h-1" />
+              <path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z" />
+              <line x1="6" y1="2" x2="6" y2="4" />
+              <line x1="10" y1="2" x2="10" y2="4" />
+              <line x1="14" y1="2" x2="14" y2="4" />
+            </svg>
+          </button>
+        </div>
+        <div class="hard-mode-badge hidden" id="hardModeBadge">
+          🔐 Hard Mode Active
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="stat-card">
+          <span class="stat-value" id="focusTimeStat">0m</span>
+          <span class="stat-label">Focus</span>
+        </div>
+        <div class="stat-card distraction">
+          <span class="stat-value" id="distractionTimeStat">0m</span>
+          <span class="stat-label">Distraction</span>
+        </div>
+        <div class="stat-card score">
+          <span class="stat-value" id="focusScoreStat">100</span>
+          <span class="stat-label">Score</span>
+        </div>
+      </div>
+
+      <!-- Daily Goal Progress -->
+      <div class="goal-bar-container">
+        <div class="goal-bar-header">
+          <span>Daily Goal</span>
+          <span id="goalText">0 / 120 min</span>
+        </div>
+        <div class="goal-bar">
+          <div class="goal-bar-fill" id="goalBarFill" style="width: 0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOCK TAB -->
+    <section class="tab-content" id="tab-block">
+      <div class="block-header">
+        <h3>Blocked Sites</h3>
+        <span class="block-count" id="blockCount">0</span>
+      </div>
+      <div class="add-block">
+        <input type="text" id="newBlockSite" placeholder="e.g., youtube.com">
+        <button class="btn-small" id="addBlockBtn">+ Add</button>
+      </div>
+      <ul class="block-list" id="blockListEl"></ul>
+    </section>
+
+    <!-- GROUP TAB -->
+    <section class="tab-content" id="tab-group">
+
+      <!-- ===== GROUP LOBBY (Create / Join / List) ===== -->
+      <div id="groupLobby">
+        <div class="group-actions">
+          <button class="btn-secondary" id="createGroupBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Create Room
+          </button>
+          <button class="btn-secondary" id="joinGroupBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            Join Room
+          </button>
+        </div>
+
+        <!-- Group Code Display -->
+        <div class="group-code-display hidden" id="groupCodeDisplay">
+          <span class="code-label">Share this code:</span>
+          <span class="group-code" id="displayCode">ABC123</span>
+          <button class="btn-copy" id="copyCodeBtn">📋 Copy</button>
+        </div>
+
+        <!-- My Rooms List -->
+        <div class="my-groups" id="myGroups">
+          <h4>My Rooms</h4>
+          <div class="groups-list" id="groupsList"></div>
+        </div>
+      </div>
+
+      <!-- ===== ROOM VIEW (waiting / running / disrupted) ===== -->
+      <div id="groupDetailView" class="hidden">
+
+        <!-- Disrupted alert -->
+        <div class="group-alert group-alert-disrupted hidden" id="groupDisruptedAlert">
+          <span class="alert-icon">💥</span>
+          <span id="disruptedAlertText">Session was disrupted!</span>
+        </div>
+
+        <!-- Deleted alert -->
+        <div class="group-alert hidden" id="groupDeletedAlert">
+          <span class="alert-icon">⚠️</span>
+          <span>This room has been closed by the admin.</span>
+        </div>
+
+        <!-- Back button -->
+        <button class="btn-back" id="backToLobby">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Rooms
+        </button>
+
+        <!-- Room Info Card -->
+        <div class="group-info-card">
+          <div class="group-info-header">
+            <h3 id="detailGroupName">Room Name</h3>
+            <span class="group-info-code" id="detailGroupCode">ABC123</span>
+          </div>
+          <div class="group-info-meta">
+            <span>👤 Admin: <strong id="detailGroupAdmin">—</strong></span>
+            <span id="detailSessionTime"></span>
+          </div>
+        </div>
+
+        <!-- Live Status -->
+        <div class="group-live-status" id="groupLiveStatus">
+          <div class="live-dot"></div>
+          <span id="liveStatusText">Waiting for members...</span>
+        </div>
+
+        <!-- Shared Timer (visible during active session) -->
+        <div class="group-shared-timer hidden" id="groupSharedTimer">
+          <span class="shared-timer-display" id="sharedTimerDisplay">00:00</span>
+          <span class="shared-timer-label">Remaining</span>
+        </div>
+
+        <!-- Members List -->
+        <div class="group-members">
+          <h4>Members <span class="member-count" id="memberCount">0</span></h4>
+          <div class="members-list" id="membersList"></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="group-controls">
+          <!-- Admin: Start (when waiting) -->
+          <button class="btn-primary btn-small" id="startGroupSessionBtn" style="display:none">
+            ▶ Start Session
+          </button>
+          <!-- Admin: Cancel Room (when waiting) -->
+          <button class="btn-danger-outline btn-small" id="cancelRoomBtn" style="display:none">
+            ✕ Cancel Room
+          </button>
+          <!-- Anyone: Cancel Session (when running — triggers disruption!) -->
+          <button class="btn-danger-outline btn-small" id="disruptSessionBtn" style="display:none">
+            💥 Cancel Session
+          </button>
+          <!-- Non-admin: Leave (when waiting) -->
+          <button class="btn-secondary btn-small btn-leave" id="leaveGroupBtn" style="display:none">
+            🚪 Leave Room
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS TAB -->
+    <section class="tab-content" id="tab-stats">
+      <div class="stats-grid">
+        <div class="stat-block">
+          <span class="stat-block-value" id="totalSessions">0</span>
+          <span class="stat-block-label">Sessions Today</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-block-value" id="tabSwitches">0</span>
+          <span class="stat-block-label">Tab Switches</span>
+        </div>
+      </div>
+      <div class="top-sites">
+        <h4>Top Sites Today</h4>
+        <div class="sites-list" id="topSitesList"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== JOIN ROOM MODAL ===== -->
+  <div class="modal-overlay hidden" id="joinGroupModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🔑 Join Room</h3>
+        <button class="modal-close" id="closeJoinGroupModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label>Room Code</label>
+          <input type="text" id="joinCode" placeholder="Enter 6-character code" maxlength="6"
+            style="text-transform:uppercase; letter-spacing:3px; font-weight:700; text-align:center;">
+        </div>
+        <div class="input-group">
+          <label>Your Name</label>
+          <input type="text" id="memberName" placeholder="e.g., John">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="confirmJoinGroup">🔑 Join Room</button>
+          <button class="btn-secondary" id="cancelJoinGroup">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CREATE ROOM MODAL ===== -->
+  <div class="modal-overlay hidden" id="createGroupModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>👥 Create Study Room</h3>
+        <button class="modal-close" id="closeCreateGroupModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label>Room Name</label>
+          <input type="text" id="groupName" placeholder="e.g., Study Squad">
+        </div>
+        <div class="input-group">
+          <label>Your Name</label>
+          <input type="text" id="adminName" placeholder="e.g., John">
+        </div>
+        <div class="input-group">
+          <label>Session Duration</label>
+          <select id="createDuration">
+            <option value="15">15 min</option>
+            <option value="25" selected>25 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">60 min</option>
+            <option value="90">90 min</option>
+            <option value="120">120 min</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input type="number" id="createCustomDuration" class="custom-duration-input hidden" 
+            placeholder="Minutes" min="1" max="480" style="margin-top:6px;">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="confirmCreateGroup">Create Room</button>
+          <button class="btn-secondary" id="cancelCreateGroup">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule & Delete modals removed — Forest-style uses simpler flow -->
+
+  <script src="firebase-config.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>
