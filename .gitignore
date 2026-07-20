@@ -1,4 +1,3 @@
-# Node modules (if any are added later)
 node_modules/
 
 # Logs
@@ -24,8 +23,6 @@ Thumbs.db
 .env.test.local
 .env.production.local
 
-# Ignore the real firebase config, we will upload firebase-config.example.js instead
 popup/firebase-config.js
 
-# Ignore the project synopsis and case study folder
 sf/
