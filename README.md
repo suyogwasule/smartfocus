@@ -23,16 +23,3 @@ Smart Focus is a distraction-control Chrome Extension designed to help users mai
 3. Enable **Developer mode** using the toggle switch in the top right corner.
 4. Click the **Load unpacked** button and select the root directory of this repository (where the `manifest.json` file is located).
 
-## Firebase Configuration (For Group Mode)
-
-By default, the group mode requires a Firebase Realtime Database to sync state across users. 
-
-1. Create a project in the [Firebase Console](https://console.firebase.google.com/).
-2. Create a Realtime Database and configure your security rules appropriately (users should only read/write to active group sessions).
-3. Copy `popup/firebase-config.example.js` and rename it to `popup/firebase-config.js`.
-4. Inside `popup/firebase-config.js`, replace the `YOUR-PROJECT-ID` placeholder URL with your actual Firebase Realtime Database URL.
-
-*(Note: `popup/firebase-config.js` is ignored by Git to protect your database URL).*
-
-## License
-MIT License
