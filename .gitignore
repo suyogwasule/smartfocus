@@ -26,3 +26,6 @@ Thumbs.db
 
 # Ignore the real firebase config, we will upload firebase-config.example.js instead
 popup/firebase-config.js
+
+# Ignore the project synopsis and case study folder
+sf/
